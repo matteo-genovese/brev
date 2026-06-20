@@ -42,19 +42,24 @@ Fully self-contained: PostgreSQL for data + auth, FastAPI backend, React dashboa
 - Link your custom domain — we handle DNS + SSL
 - Deploy, backups, scaling included
 
-### 💻 Brev CLI (planned)
+### 💻 Brev CLI
 
 ```bash
 pip install brev-cli
 
-brev login                 # API key auth
-brev create https://...    # → https://your.domain/abc
-brev list                  # your links
-brev stats <slug>          # analytics
-brev delete <slug>         # remove
+brev login user@email.com password --server https://brevl.ink
+brev create https://example.com                  # random slug
+brev create https://example.com --slug blog      # custom slug
+brev create https://example.com --title "My blog"
+brev list                                        # your links
+brev stats <slug>                                # analytics
+brev delete <slug>                               # remove
+brev whoami                                      # current user
+brev logout                                      # clear credentials
 ```
 
-Works with both OSS and Cloud.
+Works with both self-hosted (`--server http://your-instance`) and Brev Cloud.
+**Zero dependencies** — pure Python stdlib, no pip installs beyond the package itself.
 
 ---
 
@@ -107,7 +112,7 @@ http://localhost:8000/redoc   # ReDoc
 - [ ] **Dynamic domains** — add custom domains from UI
 - [ ] **Custom slug** — choose short code
 - [ ] **Analytics** — click timeline, referrer, UA
-- [ ] **CLI** — pip-installable client
+- [x] **CLI** — pip-installable client
 - [ ] **Brev Cloud** — Stripe, DNS, SSL, domains
 - [ ] **Rate limiting** — anti-spam
 - [ ] **API keys** — programmatic access
