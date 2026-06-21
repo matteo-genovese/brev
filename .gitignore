@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Docker
+.env
+
+# Node/build artifacts
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.astro/
+**/.astro/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
