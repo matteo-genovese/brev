@@ -110,6 +110,36 @@ def test_unverified_domain_cannot_be_used(client):
     assert response.status_code == 422
 
 
+def test_cloud_mode_blocks_custom_domain_without_subscription(client, monkeypatch):
+    from app.services import domains
+
+    monkeypatch.setattr(domains.settings, "cloud_mode", True)
+    monkeypatch.setattr(domains.settings, "free_custom_domains", 0)
+    token = _register_and_login(client)
+
+    response = client.post(
+        "/api/v1/domains",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"domain": "paid.example.com"},
+    )
+    assert response.status_code == 402
+
+
+def test_cloud_mode_allows_included_free_custom_domain(client, monkeypatch):
+    from app.services import domains
+
+    monkeypatch.setattr(domains.settings, "cloud_mode", True)
+    monkeypatch.setattr(domains.settings, "free_custom_domains", 1)
+    token = _register_and_login(client)
+
+    response = client.post(
+        "/api/v1/domains",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"domain": "included.example.com"},
+    )
+    assert response.status_code == 201
+
+
 def test_api_key_can_authenticate(client):
     token = _register_and_login(client)
 

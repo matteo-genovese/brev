@@ -69,10 +69,10 @@ export async function getLinks() {
   return request('/links');
 }
 
-export async function createLink({ url, slug, title }) {
+export async function createLink({ url, slug, title, domainId }) {
   return request('/links', {
     method: 'POST',
-    body: JSON.stringify({ url, slug: slug || null, title: title || null }),
+    body: JSON.stringify({ url, slug: slug || null, title: title || null, domain_id: domainId || null }),
   });
 }
 
