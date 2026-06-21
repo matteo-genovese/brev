@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install backend dependencies
+        run: python -m pip install -r backend/requirements-dev.txt bandit pip-audit
+      - name: Test backend
+        run: pytest backend/tests -q
+      - name: Audit Python dependencies
+        run: pip-audit -r backend/requirements.txt
+      - name: Static security scan
+        run: bandit -r backend/app -q
+
+  frontend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [dashboard, landing]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ matrix.app }}
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=moderate
+        working-directory: ${{ matrix.app }}
+      - name: Build
+        run: npm run build
+        working-directory: ${{ matrix.app }}

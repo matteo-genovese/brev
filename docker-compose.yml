@@ -1,0 +1,128 @@
+# ── Brev — Docker Compose ────────────────────────────────────────────
+# Zero porte host: NPM fa da entry point su :80/:443
+# Caddy fa routing interno sulla rete public_net
+#
+# Variabili d'ambiente richieste: JWT_SECRET, DB_PASSWORD
+# Opzionali: BREV_DATA, DB_USER, DB_NAME, DEFAULT_DOMAIN, CNAME_TARGET
+
+services:
+  # ─── Database ─────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: brev-db
+    restart: unless-stopped
+    volumes:
+      - ${BREV_DATA:-/home/matt/docker/brev}/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-brev}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - public_net
+
+  # ─── Backend (FastAPI) ────────────────────────────────────────────
+  backend:
+    image: ghcr.io/matteo-genovese/brev-backend:latest
+    container_name: brev-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:?DB_PASSWORD is required}@db:5432/${DB_NAME:-brev}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      DEFAULT_DOMAIN: ${DEFAULT_DOMAIN:-brevl.ink}
+      CNAME_TARGET: ${CNAME_TARGET:-proxy.brevl.ink.}
+      ENVIRONMENT: production
+      SECURE_COOKIES: "true"
+      DOCS_ENABLED: "false"
+      DEBUG: "false"
+      CORS_ORIGINS: '["https://brevl.ink","https://app.brevl.ink"]'
+    networks:
+      - public_net
+
+  # ─── Landing (Astro → nginx) ─────────────────────────────────────
+  landing:
+    image: ghcr.io/matteo-genovese/brev-landing:latest
+    container_name: brev-landing
+    restart: unless-stopped
+    networks:
+      - public_net
+
+  # ─── Dashboard (React → nginx) ───────────────────────────────────
+  dashboard:
+    image: ghcr.io/matteo-genovese/brev-dashboard:latest
+    container_name: brev-dashboard
+    restart: unless-stopped
+    networks:
+      - public_net
+
+  # ─── Caddy (router interno, NPM fa TLS) ──────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    container_name: brev-caddy
+    restart: unless-stopped
+    configs:
+      - source: brev_caddyfile
+        target: /etc/caddy/Caddyfile
+    volumes:
+      - ${BREV_DATA:-/home/matt/docker/brev}/caddy_data:/data
+      - ${BREV_DATA:-/home/matt/docker/brev}/caddy_config:/config
+    depends_on:
+      - backend
+      - landing
+      - dashboard
+    networks:
+      - public_net
+
+configs:
+  brev_caddyfile:
+    content: |
+      # Brev router interno (TLS gestito da NPM)
+      :80 {
+        # API backend
+        handle /api/* {
+          reverse_proxy backend:8000
+        }
+
+        # Swagger docs
+        handle /docs {
+          reverse_proxy backend:8000
+        }
+
+        handle /redoc {
+          reverse_proxy backend:8000
+        }
+
+        handle /openapi.json {
+          reverse_proxy backend:8000
+        }
+
+        # Health
+        handle /health {
+          reverse_proxy backend:8000
+        }
+
+        # Dashboard (sotto /app)
+        handle_path /app/* {
+          reverse_proxy dashboard:80
+        }
+
+        handle /app {
+          redir /app/ 301
+        }
+
+        # Landing (default)
+        handle {
+          reverse_proxy landing:80
+        }
+      }
+
+networks:
+  public_net:
+    external: true
