@@ -203,6 +203,7 @@ Production deployments should keep `DOCS_ENABLED=false`.
 | `DB_NAME` | no | PostgreSQL database, default `brev` |
 | `HTTP_PORT` | no | Public HTTP port exposed by Caddy, default `80` |
 | `BREV_DATA` | no | Local data directory, default `./data` |
+| `BREV_NETWORK_NAME` | no | Docker network name, default `brev_net` |
 | `POSTGRES_IMAGE` | no | PostgreSQL image used by Compose |
 | `BACKEND_IMAGE` | no | Backend image tag built or used by Compose |
 | `LANDING_IMAGE` | no | Landing image tag built or used by Compose |
