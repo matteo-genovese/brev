@@ -180,6 +180,36 @@ def test_non_admin_is_forbidden_from_admin_routes(client):
     assert response.status_code == 403
 
 
+def test_dns_txt_verification_accepts_single_record():
+    from app.services.domains import _resolver_txt_contains
+
+    class Answer:
+        strings = [b"token-value"]
+
+    class Resolver:
+        def resolve(self, name, record_type):
+            assert name == "_brev.go.example.com"
+            assert record_type == "TXT"
+            return [Answer()]
+
+    assert _resolver_txt_contains(Resolver(), "_brev.go.example.com", "token-value")
+
+
+def test_dns_txt_verification_accepts_chunked_record():
+    from app.services.domains import _resolver_txt_contains
+
+    class Answer:
+        strings = [b"token-", b"value"]
+
+    class Resolver:
+        def resolve(self, name, record_type):
+            assert name == "_brev.go.example.com"
+            assert record_type == "TXT"
+            return [Answer()]
+
+    assert _resolver_txt_contains(Resolver(), "_brev.go.example.com", "token-value")
+
+
 def test_billing_status_defaults_to_free(client):
     token = _register_and_login(client)
     response = client.get("/api/v1/billing/status", headers={"Authorization": f"Bearer {token}"})
