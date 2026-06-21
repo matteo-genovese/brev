@@ -137,4 +137,5 @@ configs:
 
 networks:
   brev_net:
+    external: true
     name: ${BREV_NETWORK:-brev_net}
