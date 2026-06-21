@@ -10,6 +10,10 @@ Brev is an MIT-licensed URL shortener for self-hosting and hosted Cloud use.
 The code is open source; the official hosted service, brand, and domains are
 operated as Brev Cloud.
 
+The name comes from the Italian word `breve`, meaning short. The product is
+built around that idea: short links, short paths, and the wordplay of
+`brev link`.
+
 ## Features
 
 - Short links with redirect and click tracking.
