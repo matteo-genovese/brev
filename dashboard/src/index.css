@@ -55,8 +55,10 @@ select {
 }
 
 .brand img {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .button {
@@ -162,6 +164,11 @@ select {
 
 .auth-brand {
   margin-bottom: 34px;
+}
+
+.auth-brand img {
+  width: 44px;
+  height: 44px;
 }
 
 .auth-card h1,
