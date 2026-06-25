@@ -73,6 +73,7 @@ select {
   color: var(--navy);
   cursor: pointer;
   font-weight: 800;
+  white-space: nowrap;
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
@@ -254,6 +255,37 @@ select:focus {
   padding: 24px;
 }
 
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(255, 250, 241, 0.52);
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.menu-toggle span:not(.sr-only) {
+  display: block;
+  width: 17px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.sidebar-menu {
+  display: contents;
+}
+
 .sidebar-nav {
   display: grid;
   gap: 8px;
@@ -428,14 +460,16 @@ select:focus {
 
 .settings-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 18px;
+  align-items: start;
   margin-top: 34px;
 }
 
 .panel-block {
   display: grid;
   gap: 18px;
+  min-width: 0;
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 28px;
@@ -444,7 +478,7 @@ select:focus {
 
 .panel-block h2 {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(2rem, 2.4vw, 3rem);
   line-height: 0.9;
 }
 
@@ -461,15 +495,21 @@ select:focus {
   gap: 10px;
 }
 
+.inline-form > * {
+  min-width: 0;
+}
+
 .data-list {
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .data-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
+  min-width: 0;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -479,6 +519,7 @@ select:focus {
 .data-row strong {
   display: block;
   margin-bottom: 6px;
+  overflow-wrap: anywhere;
 }
 
 .data-row p {
@@ -488,12 +529,17 @@ select:focus {
   font-size: 0.84rem;
 }
 
+.data-row > .button {
+  align-self: start;
+}
+
 .row-actions {
   display: flex;
   flex-wrap: wrap;
   align-content: start;
   justify-content: flex-end;
   gap: 8px;
+  min-width: 0;
 }
 
 .row-actions.left {
@@ -506,7 +552,7 @@ select:focus {
 
 .admin-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 16px;
 }
 
@@ -571,6 +617,74 @@ select:focus {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
+.domain-row {
+  align-items: start;
+}
+
+.domain-content {
+  min-width: 0;
+}
+
+.domain-name {
+  display: inline;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: rgba(7, 25, 54, 0.28);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.dns-instructions {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 250, 241, 0.5);
+}
+
+.dns-instructions .dns-intro {
+  margin: 0;
+}
+
+.dns-instructions dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.dns-instructions dl div {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.36fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.dns-instructions dt {
+  color: var(--navy-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.dns-instructions dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--navy);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.82rem;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -586,13 +700,36 @@ select:focus {
   }
 
   .sidebar {
-    position: static;
+    position: sticky;
+    z-index: 10;
     height: auto;
+    padding: 16px 18px;
   }
 
-  .sidebar-nav,
+  .menu-toggle {
+    display: grid;
+    gap: 4px;
+  }
+
+  .sidebar-menu {
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 180ms ease;
+  }
+
+  .menu-open .sidebar-menu {
+    max-height: 520px;
+  }
+
+  .sidebar-nav {
+    margin-top: 18px;
+    padding-top: 4px;
+  }
+
   .user-panel {
-    margin-top: 22px;
+    margin-top: 18px;
+    padding-bottom: 2px;
   }
 
   .main-panel {
@@ -638,5 +775,49 @@ select:focus {
 
   .row-actions {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .main-panel {
+    width: min(100% - 20px, 1120px);
+  }
+
+  .page-head {
+    gap: 18px;
+  }
+
+  .page-head .button {
+    width: 100%;
+  }
+
+  .panel-block,
+  .link-card,
+  .empty-state {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .panel-block h2 {
+    font-size: 2.15rem;
+  }
+
+  .inline-form {
+    gap: 8px;
+  }
+
+  .inline-form .button,
+  .row-actions .button {
+    width: 100%;
+  }
+
+  .status {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .dns-instructions dl div {
+    grid-template-columns: 1fr;
+    gap: 3px;
   }
 }
