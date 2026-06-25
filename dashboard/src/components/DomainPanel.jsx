@@ -80,32 +80,42 @@ export default function DomainPanel({ domains, onChange }) {
               {openDomainId === item.id && (
                 <div className="dns-instructions">
                   <p className="dns-intro">In your DNS provider, create these records for {item.domain}.</p>
-                  <dl>
-                    <div>
-                      <dt>Record type</dt>
-                      <dd>TXT</dd>
-                    </div>
-                    <div>
-                      <dt>Name / Host</dt>
-                      <dd>{item.verification_dns_name}</dd>
-                    </div>
-                    <div>
-                      <dt>Value</dt>
-                      <dd>{item.verification_token}</dd>
-                    </div>
-                    <div>
-                      <dt>Record type</dt>
-                      <dd>CNAME</dd>
-                    </div>
-                    <div>
-                      <dt>Name / Host</dt>
-                      <dd>{item.domain}</dd>
-                    </div>
-                    <div>
-                      <dt>Target / Points to</dt>
-                      <dd>{item.cname_target}</dd>
-                    </div>
-                  </dl>
+                  <div className="dns-records">
+                    <section className="dns-record">
+                      <h3>TXT verification</h3>
+                      <dl>
+                        <div>
+                          <dt>Type</dt>
+                          <dd>TXT</dd>
+                        </div>
+                        <div>
+                          <dt>Name / Host</dt>
+                          <dd>{item.verification_dns_name}</dd>
+                        </div>
+                        <div>
+                          <dt>Value</dt>
+                          <dd>{item.verification_token}</dd>
+                        </div>
+                      </dl>
+                    </section>
+                    <section className="dns-record">
+                      <h3>CNAME redirect</h3>
+                      <dl>
+                        <div>
+                          <dt>Type</dt>
+                          <dd>CNAME</dd>
+                        </div>
+                        <div>
+                          <dt>Name / Host</dt>
+                          <dd>{item.domain}</dd>
+                        </div>
+                        <div>
+                          <dt>Target / Points to</dt>
+                          <dd>{item.cname_target}</dd>
+                        </div>
+                      </dl>
+                    </section>
+                  </div>
                 </div>
               )}
             </div>
