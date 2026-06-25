@@ -75,6 +75,7 @@ services:
 
   caddy:
     image: ${CADDY_IMAGE:-brev-caddy:local}
+    pull_policy: build
     build:
       context: .
       dockerfile: Dockerfile.caddy
